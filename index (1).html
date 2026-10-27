@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1220">
+  <title>SmartPark | Parking Allocation & Navigation</title>
+  <style>
+    :root{--bg:#f4f7fb;--panel:#fff;--ink:#152238;--muted:#66758b;--blue:#2563eb;--cyan:#06b6d4;--line:#e4eaf2;--green:#16a34a;--red:#dc2626;--amber:#d97706}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    header{background:linear-gradient(120deg,#0b1220,#142b52);color:white;padding:22px clamp(16px,4vw,56px);display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+    .brand{display:flex;gap:12px;align-items:center}.logo{display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#38bdf8,#2563eb);font-size:23px}
+    h1{font-size:clamp(20px,3vw,28px);margin:0}.subtitle{color:#b8c7e0;font-size:13px;margin-top:5px}.status{border:1px solid #355078;border-radius:999px;padding:8px 12px;font-size:12px;color:#dbeafe}
+    main{max-width:1200px;margin:auto;padding:24px clamp(14px,3vw,32px) 42px}.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:22px}.eyebrow{color:var(--blue);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}.hero h2{font-size:clamp(24px,4vw,34px);margin:7px 0}.hero p{color:var(--muted);margin:0;max-width:650px;line-height:1.6}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:20px 0}.stat,.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;box-shadow:0 5px 18px #142b5208}.stat{padding:18px}.stat .label{font-size:12px;color:var(--muted)}.stat .num{font-size:29px;font-weight:800;margin-top:9px}.stat .hint{font-size:12px;color:var(--muted);margin-top:5px}
+    .layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:16px}.panel{padding:21px;margin-bottom:16px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.panel h3{margin:0;font-size:17px}.muted{color:var(--muted);font-size:12px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}label{display:block;font-size:12px;font-weight:700;color:#43516a;margin-bottom:7px}input,select{width:100%;border:1px solid #d7e0ec;border-radius:10px;padding:12px;background:#fff;color:var(--ink);font:inherit;outline:none}input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2563eb18}
+    .btn{border:0;border-radius:10px;padding:12px 15px;background:var(--blue);color:white;font-weight:750;cursor:pointer;font:inherit}.btn:hover{filter:brightness(.95)}.btn.secondary{background:#eaf1ff;color:#1d4ed8}.btn.danger{background:#fff0f0;color:#b91c1c}.btn-row{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}.full{grid-column:1/-1}
+    .lot-list{display:grid;gap:11px}.lot{border:1px solid var(--line);border-radius:13px;padding:13px;display:flex;align-items:center;justify-content:space-between;gap:12px}.lot-left{display:flex;gap:12px;align-items:center}.lot-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:11px;background:#eaf2ff;color:#1d4ed8;font-weight:800}.lot-name{font-weight:750}.lot-sub{font-size:12px;color:var(--muted);margin-top:4px}.pill{font-size:11px;font-weight:800;border-radius:999px;padding:6px 9px;white-space:nowrap}.pill.available{background:#dcfce7;color:#166534}.pill.full{background:#fee2e2;color:#991b1b}
+    .route-map{background:#f8fbff;border:1px solid var(--line);border-radius:13px;padding:16px}.map-legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:12px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;background:var(--blue)}.dot.green{background:var(--green)}.dot.gray{background:#94a3b8}
+    .route-result{display:none;margin-top:14px;padding:14px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;line-height:1.6}.route-result.show{display:block}.route-result strong{color:#1d4ed8}
+    .table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);white-space:nowrap}th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}tbody tr:last-child td{border-bottom:0}.empty{text-align:center;color:var(--muted);padding:25px}
+    .notice{padding:12px 14px;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;color:#9a3412;font-size:12px;line-height:1.5;margin-top:14px}
+    footer{text-align:center;color:var(--muted);font-size:12px;padding:22px;border-top:1px solid var(--line)}
+    @media(max-width:800px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}}
+    @media(max-width:450px){.form-grid{grid-template-columns:1fr}.stats{gap:9px}.stat{padding:14px}.stat .num{font-size:24px}.panel{padding:15px}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">P</div><div><h1>SmartPark</h1><div class="subtitle">Smart Parking Allocation & Navigation Optimization</div></div></div>
+  <div class="status">● DEMO MODE · Browser storage</div>
+</header>
+<main>
+  <section class="hero">
+    <div><div class="eyebrow">Parking, simplified</div><h2>Find a space. Follow the route.</h2><p>Allocate parking spaces using vehicle priority and distance, monitor lot capacity, and view a suggested route from the entry gate.</p></div>
+    <button class="btn secondary" id="resetBtn">Reset demo data</button>
+  </section>
+
+  <section class="stats" aria-label="Parking summary">
+    <div class="stat"><div class="label">Total spaces</div><div class="num" id="totalSpaces">0</div><div class="hint">Across all parking lots</div></div>
+    <div class="stat"><div class="label">Available spaces</div><div class="num" id="availableSpaces">0</div><div class="hint">Ready for allocation</div></div>
+    <div class="stat"><div class="label">Occupied spaces</div><div class="num" id="occupiedSpaces">0</div><div class="hint">Currently allocated</div></div>
+    <div class="stat"><div class="label">Vehicles served</div><div class="num" id="vehiclesServed">0</div><div class="hint">In this browser demo</div></div>
+  </section>
+
+  <div class="layout">
+    <div>
+      <section class="panel">
+        <div class="panel-head"><h3>Register a vehicle</h3><span class="muted">Priority-based allocation</span></div>
+        <form id="vehicleForm">
+          <div class="form-grid">
+            <div><label for="vehicleId">Vehicle ID / number</label><input id="vehicleId" maxlength="20" placeholder="e.g. TN 37 AB 1234" required></div>
+            <div><label for="priority">Vehicle priority</label><select id="priority"><option value="1">Regular · Priority 1</option><option value="2">Staff / reserved · Priority 2</option><option value="3">Emergency · Priority 3</option></select></div>
+            <div class="full"><label for="entry">Entry point</label><select id="entry"><option value="0">Main Gate (Node 0)</option><option value="1">North Gate (Node 1)</option><option value="2">East Gate (Node 2)</option></select></div>
+          </div>
+          <div class="btn-row"><button class="btn" type="submit">Allocate parking</button><button class="btn secondary" type="button" id="clearForm">Clear form</button></div>
+        </form>
+        <div class="notice">Demo only: data is stored in this browser using localStorage. It is not connected to a Java backend or a shared database, so different visitors will not see each other's changes.</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h3>Parking lots</h3><span class="muted">Live demo capacity</span></div>
+        <div id="lotList" class="lot-list"></div>
+      </section>
+    </div>
+
+    <div>
+      <section class="panel">
+        <div class="panel-head"><h3>Route navigation</h3><span class="muted">Shortest-path estimate</span></div>
+        <div class="route-map">
+          <svg viewBox="0 0 330 205" role="img" aria-label="Schematic road graph showing gates and parking lots" width="100%" style="display:block;max-height:230px">
+            <g stroke="#cbd5e1" stroke-width="5" stroke-linecap="round" fill="none">
+              <path d="M25 105 L95 50 L165 105 L235 50 L305 105"/>
+              <path d="M95 50 L95 160 L165 105 L235 160 L235 50"/>
+              <path d="M165 105 L165 180"/>
+            </g>
+            <g stroke="#2563eb" stroke-width="3" stroke-linecap="round" fill="none" stroke-dasharray="5 5"><path d="M25 105 L95 50 L165 105 L235 160"/></g>
+            <g fill="#2563eb" stroke="white" stroke-width="3"><circle cx="25" cy="105" r="10"/><circle cx="95" cy="50" r="10"/><circle cx="165" cy="105" r="10"/></g>
+            <g fill="#16a34a" stroke="white" stroke-width="3"><circle cx="235" cy="50" r="10"/><circle cx="305" cy="105" r="10"/><circle cx="95" cy="160" r="10"/><circle cx="235" cy="160" r="10"/><circle cx="165" cy="180" r="10"/></g>
+            <g font-size="10" font-weight="700" fill="#334155"><text x="12" y="128">Gate 0</text><text x="76" y="32">Gate 1</text><text x="146" y="128">Gate 2</text><text x="214" y="32">Lot A</text><text x="285" y="128">Lot B</text><text x="72" y="183">Lot C</text><text x="216" y="183">Lot D</text><text x="149" y="201">Lot E</text></g>
+          </svg>
+          <div class="map-legend"><span><i class="dot"></i>Entry nodes</span><span><i class="dot green"></i>Parking lots</span><span><i class="dot gray"></i>Road network</span></div>
+        </div>
+        <div id="routeResult" class="route-result"></div>
+        <p class="muted" style="line-height:1.6;margin-bottom:0">The diagram is illustrative, not a geographic map. Route costs are sample road weights used for this prototype.</p>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h3>Recent allocations</h3><span class="muted" id="allocationCount">0 records</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Vehicle</th><th>Priority</th><th>Parking</th><th>Cost</th><th>Action</th></tr></thead><tbody id="allocationRows"></tbody></table></div>
+        <div class="empty" id="emptyAllocations">No vehicles allocated yet. Register a vehicle to begin.</div>
+      </section>
+    </div>
+  </div>
+</main>
+<footer>SmartPark · DAA project prototype · Shortest-path and priority-based allocation demo</footer>
+
+<script>
+(() => {
+  const STORAGE_KEY = "smartpark-demo-v1";
+  const defaultLots = [
+    {id:"A",name:"Lot A",node:5,capacity:4,free:4},
+    {id:"B",name:"Lot B",node:6,capacity:5,free:5},
+    {id:"C",name:"Lot C",node:7,capacity:3,free:3},
+    {id:"D",name:"Lot D",node:8,capacity:4,free:4},
+    {id:"E",name:"Lot E",node:9,capacity:2,free:2}
+  ];
+  // Undirected weighted road graph inspired by the supplied Java sample graph.
+  const roads = [[0,1,4],[0,2,2],[1,2,1],[1,3,5],[2,4,7],[3,4,4],[3,5,3],[3,6,6],[4,7,2],[4,8,5],[7,8,1],[4,9,9],[5,6,2]];
+  let state = loadState();
+  function freshState(){return {lots:defaultLots.map(x=>({...x})),allocations:[],nextArrival:1};}
+  function loadState(){try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY));if(s&&Array.isArray(s.lots)&&Array.isArray(s.allocations))return s;}catch(e){}return freshState();}
+  function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}}
+  function shortestPaths(start){
+    const n=10, adj=Array.from({length:n},()=>[]);
+    roads.forEach(([u,v,w])=>{adj[u].push([v,w]);adj[v].push([u,w]);});
+    const dist=Array(n).fill(Infinity), prev=Array(n).fill(-1), used=Array(n).fill(false);dist[start]=0;
+    for(let k=0;k<n;k++){let u=-1;for(let i=0;i<n;i++)if(!used[i]&&(u<0||dist[i]<dist[u]))u=i;if(u<0||!Number.isFinite(dist[u]))break;used[u]=true;
+      for(const [v,w] of adj[u])if(dist[u]+w<dist[v]){dist[v]=dist[u]+w;prev[v]=u;}}
+    return {dist,prev};
+  }
+  function pathTo(node,prev){const p=[];for(let x=node;x!==-1;x=prev[x])p.push(x);return p.reverse();}
+  function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+  function render(){
+    const total=state.lots.reduce((a,l)=>a+l.capacity,0), free=state.lots.reduce((a,l)=>a+l.free,0);
+    document.getElementById("totalSpaces").textContent=total;
+    document.getElementById("availableSpaces").textContent=free;
+    document.getElementById("occupiedSpaces").textContent=total-free;
+    document.getElementById("vehiclesServed").textContent=state.allocations.filter(a=>a.status==="Allocated").length;
+    document.getElementById("lotList").innerHTML=state.lots.map(l=>`<div class="lot"><div class="lot-left"><div class="lot-icon">${l.id}</div><div><div class="lot-name">${l.name}</div><div class="lot-sub">Node ${l.node} · ${l.capacity-l.free} occupied of ${l.capacity}</div></div></div><span class="pill ${l.free>0?"available":"full"}">${l.free} free</span></div>`).join("");
+    const rows=document.getElementById("allocationRows");
+    rows.innerHTML=state.allocations.slice().reverse().map(a=>`<tr><td><strong>${escapeHtml(a.vehicle)}</strong></td><td>P${a.priority}</td><td>${escapeHtml(a.lot||"—")}</td><td>${a.cost===null?"—":a.cost}</td><td>${a.status==="Allocated"?`<button class="btn danger" style="padding:7px 9px;font-size:11px" data-release="${a.id}">Release</button>`:`<span style="color:#b91c1c">Rejected</span>`}</td></tr>`).join("");
+    document.getElementById("emptyAllocations").style.display=state.allocations.length?"none":"block";
+    document.getElementById("allocationCount").textContent=state.allocations.length+" records";
+    rows.querySelectorAll("[data-release]").forEach(btn=>btn.addEventListener("click",()=>releaseAllocation(btn.dataset.release)));
+  }
+  function showRoute(a){
+    const box=document.getElementById("routeResult");
+    if(a.status!=="Allocated"){box.className="route-result show";box.innerHTML=`<strong>No parking space available.</strong><br>${escapeHtml(a.vehicle)} could not be assigned because all reachable lots are full.`;return;}
+    box.className="route-result show";
+    box.innerHTML=`<strong>${escapeHtml(a.vehicle)} → ${escapeHtml(a.lot)}</strong><br>Estimated route cost: <strong>${a.cost}</strong> units<br>Route nodes: <strong>${a.path.join(" → ")}</strong><br>Priority: P${a.priority}`;
+  }
+  document.getElementById("vehicleForm").addEventListener("submit",e=>{
+    e.preventDefault();
+    const vehicle=document.getElementById("vehicleId").value.trim().toUpperCase();
+    const priority=Number(document.getElementById("priority").value),entry=Number(document.getElementById("entry").value);
+    if(!vehicle){alert("Please enter a vehicle ID.");return;}
+    if(state.allocations.some(a=>a.vehicle===vehicle&&a.status==="Allocated")){alert("This vehicle already has an active parking allocation.");return;}
+    const {dist,prev}=shortestPaths(entry);
+    const candidates=state.lots.filter(l=>l.free>0&&Number.isFinite(dist[l.node])).sort((a,b)=>dist[a.node]-dist[b.node]||a.node-b.node);
+    let allocation;
+    if(!candidates.length){allocation={id:String(state.nextArrival++),vehicle,priority,entry,status:"Rejected",lot:null,cost:null,path:[],arrival:Date.now()};}
+    else{const lot=candidates[0];lot.free--;allocation={id:String(state.nextArrival++),vehicle,priority,entry,status:"Allocated",lot:lot.name,lotId:lot.id,cost:dist[lot.node],path:pathTo(lot.node,prev),arrival:Date.now()};}
+    // Keep allocation order by priority (higher priority first); arrival order breaks ties.
+    state.allocations.push(allocation);
+    state.allocations.sort((a,b)=>b.priority-a.priority||a.arrival-b.arrival);
+    save();render();showRoute(allocation);
+    if(allocation.status==="Rejected")alert("No reachable free parking space is available.");
+  });
+  function releaseAllocation(id){
+    const a=state.allocations.find(x=>x.id===id);if(!a||a.status!=="Allocated")return;
+    const lot=state.lots.find(l=>l.id===a.lotId);if(lot)lot.free=Math.min(lot.capacity,lot.free+1);
+    a.status="Released";a.lot=a.lot+" (released)";save();render();
+  }
+  document.getElementById("clearForm").addEventListener("click",()=>{document.getElementById("vehicleForm").reset();document.getElementById("vehicleId").focus();});
+  document.getElementById("resetBtn").addEventListener("click",()=>{if(confirm("Reset all demo allocations and restore lot capacity?")){state=freshState();save();render();document.getElementById("routeResult").className="route-result";document.getElementById("routeResult").innerHTML="";}});
+  render();
+})();
+</script>
+</body>
+</html>
